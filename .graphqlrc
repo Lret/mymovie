@@ -1,0 +1,15 @@
+schema:
+  - ${GRAPH_API_ENDPOINT:http://127.0.0.1:4000/graphql}:
+      # extra indent
+      headers:
+        ${GRAPH_API_AUTH_HEADER:x-api-key}: ${GRAPH_API_KEY:''}
+ignoreNoDocuments: true
+documents:
+  [
+    "app/**/*.{ts,tsx,gql,graphql}",
+    "src/app/**/*.{ts,tsx,gql,graphql}",
+    "grafbase/*.{ts,tsx,gql,graphql}",
+  ]
+generates:
+  src/app/gql/:
+    preset: client

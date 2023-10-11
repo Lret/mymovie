@@ -1,41 +1,29 @@
-// "use client"
+import { client, gql } from "@/app/lib/graphQLClient";
 
-import { resolve, type Movie, useQuery } from "../../gqty";
-// import { resolve, type Movie } from "../../gqty";
-
+const moviesQuery = gql(`
+  query getMovies($first: Int = 10){
+    movieCollection(first: $first) {
+      edges {
+        node {
+          title
+          id
+        }
+      }
+    }
+  }
+`);
 
 export default async function Home() {
-  // const movieCollection = await resolve(({ query: { 
-  //   //@ts-ignore
-  //   movieCollection
-  //   // : {
-  //   //   edges : {
-  //   //     node : {
-  //   //         //@ts-ignore
-
-  //   //       title,
-  //   //         //@ts-ignore
-
-  //   //       content
-  //   //     }
-  //   //   }
-  //   // }
-  //  } }) => { movieCollection({first: 10}) });
-
-  // const { movieCollection } = useQuery();
-  const { movieCollection } = useQuery({ suspense: true });
+  const { movieCollection } = await client.request(moviesQuery, {});
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <h1 className="text-xl font-semibold">Movie me</h1>
       <ul>
-      {/* {movieCollection.edges.map(({node}: {node: Movie}) => (<li key={node.id}>
-          {node.title}
-        </li>))} */}
-        {movieCollection({first: 10}).edges.map(({node}: {node: Movie}) => (<li key={node.id}>
-          {node.title}
-        </li>))}
+        {movieCollection?.edges?.map((movie) => (
+          <li key={movie?.node.id}>{movie?.node.title}</li>
+        ))}
       </ul>
     </main>
-  )
+  );
 }
