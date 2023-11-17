@@ -1,29 +1,27 @@
-import { client, gql } from "@/app/lib/graphQLClient";
+import { MovieListServer } from './components/MovieListServer';
+import { MovieList } from './components/MovieList';
+import { revalidatePath } from 'next/cache';
+import { RandomServerRiddle } from './components/RandomServerRiddle';
 
-const moviesQuery = gql(`
-  query getMovies($first: Int = 10){
-    movieCollection(first: $first) {
-      edges {
-        node {
-          title
-          id
-        }
-      }
-    }
-  }
-`);
+type Response = 'like' | 'neutral' | 'dislike';
 
-export default async function Home() {
-  const { movieCollection } = await client.request(moviesQuery, {});
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const page = Number(searchParams?.page);
+  const revalidate = async () => {
+    'use server';
+    revalidatePath('/');
+  };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-xl font-semibold">Movie me</h1>
-      <ul>
-        {movieCollection?.edges?.map((movie) => (
-          <li key={movie?.node.id}>{movie?.node.title}</li>
-        ))}
-      </ul>
-    </main>
+    <div className='container space-y-4'>
+      {/* <MovieListServer page={page} onNext={next} /> */}
+      <RandomServerRiddle revalidate={revalidate} />
+      <MovieList />
+      <MovieList />
+    </div>
   );
 }
